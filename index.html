@@ -332,12 +332,11 @@ html, body {
 </head>
 <body>
 
-<!-- The actual viewer, hidden until launch -->
+<!-- The actual viewer, src injected on click to prevent early load -->
 <iframe
   id="viewerFrame"
-  src="https://test-six-gules-97.vercel.app/"
-  allow="cross-origin-isolated"
-  loading="lazy">
+  src="about:blank"
+  allow="cross-origin-isolated">
 </iframe>
 
 <!-- Scan animation layer -->
@@ -392,7 +391,7 @@ html, body {
       </div>
     </div>
 
-    <button class="btn-launch" id="launchBtn" onclick="launch()">
+    <button class="btn-launch" id="launchBtn" type="button">
       <span class="btn-icon">◈</span>
       Launch Demo Viewer
     </button>
@@ -407,11 +406,14 @@ function launch() {
   const overlay = document.getElementById('overlay');
   const frame = document.getElementById('viewerFrame');
 
+  // Inject src now so it starts loading in background
+  frame.src = 'https://test-six-gules-97.vercel.app/';
+
   // Button loading state
   btn.classList.add('loading');
   btn.innerHTML = '<span style="display:inline-block;width:12px;height:12px;border:1.5px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite"></span> Loading…';
 
-  // Add spin keyframe dynamically
+  // Spin keyframe
   if(!document.getElementById('spinStyle')) {
     const s = document.createElement('style');
     s.id = 'spinStyle';
@@ -419,19 +421,18 @@ function launch() {
     document.head.appendChild(s);
   }
 
-  // Short delay then start scan
+  // Start scan animation after brief pause
   setTimeout(() => {
-    // Activate scan overlay
     scan.classList.add('active');
     scan.querySelector('.scan-line').classList.add('running');
     scan.querySelector('.scan-grid').classList.add('running');
 
-    // Midway through scan — start fading the overlay
+    // Fade out overlay mid-scan
     setTimeout(() => {
       overlay.classList.add('fade-out');
     }, 700);
 
-    // After scan completes — reveal iframe
+    // Reveal iframe after scan
     setTimeout(() => {
       frame.classList.add('revealed');
       scan.style.transition = 'opacity 0.5s';
@@ -441,6 +442,7 @@ function launch() {
 
   }, 300);
 }
+document.getElementById('launchBtn').addEventListener('click', launch);
 </script>
 </body>
 </html>
