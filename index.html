@@ -7,351 +7,129 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
 :root {
-  --bg: #070910;
-  --accent: #00e5a0;
-  --blue: #1a8cff;
-  --text: #d8e4f0;
-  --muted: #4e607a;
-  --muted2: #7a92b0;
-  --border: #1a2133;
+  --bg:#070910; --accent:#00e5a0; --blue:#1a8cff;
+  --text:#d8e4f0; --muted:#4e607a; --muted2:#7a92b0; --border:#1a2133;
 }
+html, body { height:100%; width:100%; background:var(--bg); font-family:'JetBrains Mono',monospace; overflow:hidden; }
 
-html, body {
-  height: 100%; width: 100%;
-  background: var(--bg);
-  font-family: 'JetBrains Mono', monospace;
-  overflow: hidden;
-}
-
-/* ── IFRAME ── */
 #viewerFrame {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 1;
-  transform: scale(1.015);
-  transition: opacity 0.9s ease, transform 0.9s ease;
+  position:fixed; inset:0; width:100%; height:100%; border:none;
+  opacity:0; pointer-events:none; z-index:1;
+  transform:scale(1.015);
+  transition:opacity 0.9s ease, transform 0.9s ease;
 }
-#viewerFrame.revealed {
-  opacity: 1;
-  pointer-events: all;
-  transform: scale(1);
-}
+#viewerFrame.revealed { opacity:1; pointer-events:all; transform:scale(1); }
 
-/* ── OVERLAY ── */
 #overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(7, 9, 16, 0.92);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  transition: opacity 0.7s ease, backdrop-filter 0.7s ease;
+  position:fixed; inset:0; z-index:10;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(7,9,16,0.92);
+  backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  transition:opacity 0.7s ease;
 }
-#overlay.fade-out {
-  opacity: 0;
-  pointer-events: none;
-  backdrop-filter: blur(0px);
-}
-
-/* ── GRID BG ── */
+#overlay.fade-out { opacity:0; pointer-events:none; }
 #overlay::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(0,229,160,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,229,160,0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
-  pointer-events: none;
+  content:''; position:absolute; inset:0;
+  background-image:linear-gradient(rgba(0,229,160,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,.04) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);
+  pointer-events:none;
 }
-
-/* ── GLOW ── */
 #overlay::after {
-  content: '';
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(0,229,160,0.07) 0%, transparent 70%);
-  pointer-events: none;
-  animation: pulse 4s ease-in-out infinite;
+  content:''; position:absolute; width:600px; height:600px;
+  top:50%; left:50%; transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(0,229,160,.07) 0%,transparent 70%);
+  pointer-events:none; animation:pulse 4s ease-in-out infinite;
 }
-@keyframes pulse { 0%,100%{opacity:.6;} 50%{opacity:1;} }
+@keyframes pulse { 0%,100%{opacity:.6} 50%{opacity:1} }
 
-/* ── CARD ── */
 .card {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  max-width: 560px;
-  padding: 0 24px;
-  animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) both;
+  position:relative; z-index:2; text-align:center;
+  max-width:560px; padding:0 24px;
+  animation:fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) both;
 }
-@keyframes fadeUp {
-  from { opacity:0; transform: translateY(28px); }
-  to   { opacity:1; transform: translateY(0); }
-}
+@keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
 
-/* tag */
 .tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 12px;
-  border: 1px solid rgba(0,229,160,0.25);
-  border-radius: 20px;
-  font-size: 9.5px;
-  color: var(--accent);
-  letter-spacing: 1.8px;
-  text-transform: uppercase;
-  margin-bottom: 24px;
-  background: rgba(0,229,160,0.05);
-  animation: fadeUp 0.9s 0.1s cubic-bezier(0.16,1,0.3,1) both;
+  display:inline-flex; align-items:center; gap:8px;
+  padding:5px 12px; border:1px solid rgba(0,229,160,.25); border-radius:20px;
+  font-size:9.5px; color:var(--accent); letter-spacing:1.8px; text-transform:uppercase;
+  margin-bottom:24px; background:rgba(0,229,160,.05);
+  animation:fadeUp 0.9s 0.1s cubic-bezier(0.16,1,0.3,1) both;
 }
-.tag-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: blink 1.6s infinite;
-}
-@keyframes blink { 50%{opacity:0.2;} }
+.tag-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:blink 1.6s infinite; }
+@keyframes blink { 50%{opacity:.2} }
 
-/* heading */
 .card h2 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(28px, 5vw, 46px);
-  font-weight: 800;
-  color: var(--text);
-  line-height: 1.1;
-  letter-spacing: -1px;
-  margin-bottom: 14px;
-  animation: fadeUp 0.9s 0.18s cubic-bezier(0.16,1,0.3,1) both;
+  font-family:'Syne',sans-serif; font-size:clamp(28px,5vw,46px); font-weight:800;
+  color:var(--text); line-height:1.1; letter-spacing:-1px; margin-bottom:14px;
+  animation:fadeUp 0.9s 0.18s cubic-bezier(0.16,1,0.3,1) both;
 }
-.card h2 em {
-  font-style: normal;
-  color: var(--accent);
-}
-
-/* subtitle */
+.card h2 em { font-style:normal; color:var(--accent); }
 .card .sub {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(14px, 2vw, 17px);
-  font-weight: 600;
-  color: var(--muted2);
-  margin-bottom: 16px;
-  letter-spacing: -0.3px;
-  animation: fadeUp 0.9s 0.24s cubic-bezier(0.16,1,0.3,1) both;
+  font-family:'Syne',sans-serif; font-size:clamp(14px,2vw,17px); font-weight:600;
+  color:var(--muted2); margin-bottom:16px; letter-spacing:-0.3px;
+  animation:fadeUp 0.9s 0.24s cubic-bezier(0.16,1,0.3,1) both;
 }
-
-/* paragraph */
 .card p {
-  font-size: 11px;
-  color: var(--muted);
-  line-height: 2;
-  margin-bottom: 36px;
-  animation: fadeUp 0.9s 0.3s cubic-bezier(0.16,1,0.3,1) both;
+  font-size:11px; color:var(--muted); line-height:2; margin-bottom:36px;
+  animation:fadeUp 0.9s 0.3s cubic-bezier(0.16,1,0.3,1) both;
 }
-.card p b {
-  color: var(--muted2);
-  font-weight: 500;
-}
+.card p b { color:var(--muted2); font-weight:500; }
 
-/* stats row */
 .stats {
-  display: flex;
-  justify-content: center;
-  gap: 32px;
-  margin-bottom: 36px;
-  animation: fadeUp 0.9s 0.36s cubic-bezier(0.16,1,0.3,1) both;
+  display:flex; justify-content:center; gap:32px; margin-bottom:36px;
+  animation:fadeUp 0.9s 0.36s cubic-bezier(0.16,1,0.3,1) both;
 }
-.stat { text-align: center; }
-.stat-n {
-  font-family: 'Syne', sans-serif;
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--accent);
-  display: block;
-  letter-spacing: -0.5px;
-}
-.stat-l {
-  font-size: 8.5px;
-  color: var(--muted);
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-}
-.stat-sep {
-  width: 1px;
-  background: var(--border);
-  align-self: stretch;
-}
+.stat { text-align:center; }
+.stat-n { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--accent); display:block; letter-spacing:-0.5px; }
+.stat-l { font-size:8.5px; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase; }
+.stat-sep { width:1px; background:var(--border); align-self:stretch; }
 
-/* button */
 .btn-launch {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 36px;
-  background: var(--accent);
-  color: #040608;
-  font-family: 'Syne', sans-serif;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.18s;
-  overflow: hidden;
-  animation: fadeUp 0.9s 0.42s cubic-bezier(0.16,1,0.3,1) both;
+  position:relative; display:inline-flex; align-items:center; gap:10px;
+  padding:14px 36px; background:var(--accent); color:#040608;
+  font-family:'Syne',sans-serif; font-size:13px; font-weight:800; letter-spacing:0.3px;
+  border:none; border-radius:6px; cursor:pointer; transition:all .18s; overflow:hidden;
+  animation:fadeUp 0.9s 0.42s cubic-bezier(0.16,1,0.3,1) both;
 }
-.btn-launch::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
-}
-.btn-launch:hover {
-  background: #00ffb3;
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0,229,160,0.35);
-}
-.btn-launch:active { transform: translateY(0); }
-.btn-icon { font-size: 16px; }
+.btn-launch::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 60%); }
+.btn-launch:hover { background:#00ffb3; transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,229,160,.35); }
+.btn-launch:active { transform:translateY(0); }
+.btn-launch:disabled { cursor:default; transform:none !important; background:rgba(0,229,160,.12); color:var(--accent); border:1px solid rgba(0,229,160,.25); box-shadow:none; }
 
-/* loading state */
-.btn-launch.loading {
-  pointer-events: none;
-  background: rgba(0,229,160,0.2);
-  color: var(--accent);
-  border: 1px solid rgba(0,229,160,0.3);
-  gap: 12px;
-}
+@keyframes spin { to{transform:rotate(360deg)} }
+.spin-ring { display:inline-block; width:12px; height:12px; border:1.5px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spin .6s linear infinite; flex-shrink:0; }
 
-/* spinner */
-@keyframes spin { to { transform: rotate(360deg); } }
-.spin-ring {
-  display: inline-block;
-  width: 12px; height: 12px;
-  border: 1.5px solid var(--accent);
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  flex-shrink: 0;
-}
-
-/* ── SCAN ANIMATION ── */
-#scanOverlay {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-#scanOverlay.active { opacity: 1; }
-
+#scanOverlay { position:fixed; inset:0; z-index:20; pointer-events:none; opacity:0; transition:opacity 0.3s; }
+#scanOverlay.active { opacity:1; }
 .scan-line {
-  position: absolute;
-  left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent), rgba(0,229,160,0.4), transparent);
-  top: -2px;
-  animation: none;
-  box-shadow: 0 0 20px rgba(0,229,160,0.6), 0 0 60px rgba(0,229,160,0.2);
+  position:absolute; left:0; right:0; height:2px; top:-2px;
+  background:linear-gradient(90deg,transparent,var(--accent),rgba(0,229,160,.4),transparent);
+  box-shadow:0 0 20px rgba(0,229,160,.6),0 0 60px rgba(0,229,160,.2);
 }
-.scan-line.running {
-  animation: scanDown 1.2s cubic-bezier(0.4,0,0.6,1) forwards;
-}
-@keyframes scanDown {
-  0%   { top: -2px; opacity:1; }
-  85%  { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
-}
-
-.scan-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(0,229,160,0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,229,160,0.06) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: 0;
-  animation: none;
-}
-.scan-grid.running {
-  animation: gridFlash 1.2s ease forwards;
-}
-@keyframes gridFlash {
-  0%   { opacity:0; }
-  15%  { opacity:1; }
-  70%  { opacity:0.3; }
-  100% { opacity:0; }
-}
-
-/* corner brackets */
-.bracket {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
+.scan-line.running { animation:scanDown 1.2s cubic-bezier(0.4,0,0.6,1) forwards; }
+@keyframes scanDown { 0%{top:-2px;opacity:1} 85%{opacity:1} 100%{top:100%;opacity:0} }
+.scan-grid { position:absolute; inset:0; opacity:0; background-image:linear-gradient(rgba(0,229,160,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,.06) 1px,transparent 1px); background-size:40px 40px; }
+.scan-grid.running { animation:gridFlash 1.2s ease forwards; }
+@keyframes gridFlash { 0%{opacity:0} 15%{opacity:1} 70%{opacity:.3} 100%{opacity:0} }
+.bracket { position:absolute; width:40px; height:40px; opacity:0; transition:opacity 0.3s; }
 .bracket.tl { top:20px; left:20px; border-top:1.5px solid var(--accent); border-left:1.5px solid var(--accent); }
 .bracket.tr { top:20px; right:20px; border-top:1.5px solid var(--accent); border-right:1.5px solid var(--accent); }
 .bracket.bl { bottom:20px; left:20px; border-bottom:1.5px solid var(--accent); border-left:1.5px solid var(--accent); }
 .bracket.br { bottom:20px; right:20px; border-bottom:1.5px solid var(--accent); border-right:1.5px solid var(--accent); }
 #scanOverlay.active .bracket { opacity:1; }
-
-/* status text */
-.scan-status {
-  position: absolute;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10px;
-  color: var(--accent);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  opacity: 0;
-  white-space: nowrap;
-}
-#scanOverlay.active .scan-status {
-  animation: statusFade 1.4s ease forwards;
-}
-@keyframes statusFade {
-  0%   { opacity:0; }
-  20%  { opacity:1; }
-  80%  { opacity:1; }
-  100% { opacity:0; }
-}
+.scan-status { position:absolute; bottom:28px; left:50%; transform:translateX(-50%); font-size:10px; color:var(--accent); letter-spacing:2px; text-transform:uppercase; opacity:0; white-space:nowrap; }
+#scanOverlay.active .scan-status { animation:statusFade 1.4s ease forwards; }
+@keyframes statusFade { 0%{opacity:0} 20%{opacity:1} 80%{opacity:1} 100%{opacity:0} }
 </style>
 </head>
 <body>
 
-<!-- The actual viewer, src injected on click to prevent early load -->
-<iframe
-  id="viewerFrame"
-  src="about:blank"
-  allow="cross-origin-isolated">
-</iframe>
+<iframe id="viewerFrame" src="about:blank"></iframe>
 
-<!-- Scan animation layer -->
 <div id="scanOverlay">
   <div class="scan-grid"></div>
   <div class="scan-line"></div>
@@ -362,101 +140,61 @@ html, body {
   <div class="scan-status">Initialising BIM viewer…</div>
 </div>
 
-<!-- Landing overlay -->
 <div id="overlay">
   <div class="card">
-
-    <div class="tag">
-      <div class="tag-dot"></div>
-      Live Demo — IFC4X3 · Civil 3D 2026
-    </div>
-
+    <div class="tag"><div class="tag-dot"></div>Live Demo — IFC4X3 · Civil 3D 2026</div>
     <h2>Interactive <em>BIM</em><br>Infrastructure Viewer</h2>
-
     <div class="sub">Montreal Transit Infrastructure · STR Discipline</div>
-
     <p>
       A fully client-side BIM viewer built with <b>Three.js</b> and a custom <b>IFC4X3 parser</b>.<br>
       Explore real structural data — geometry, property sets, asset lifecycle status —<br>
       directly in the browser. No plugin. No server. No upload.
     </p>
-
     <div class="stats">
-      <div class="stat">
-        <span class="stat-n">1,308</span>
-        <span class="stat-l">Elements</span>
-      </div>
+      <div class="stat"><span class="stat-n">1,308</span><span class="stat-l">Elements</span></div>
       <div class="stat-sep"></div>
-      <div class="stat">
-        <span class="stat-n">IFC4X3</span>
-        <span class="stat-l">Schema</span>
-      </div>
+      <div class="stat"><span class="stat-n">IFC4X3</span><span class="stat-l">Schema</span></div>
       <div class="stat-sep"></div>
-      <div class="stat">
-        <span class="stat-n">IDD-IR</span>
-        <span class="stat-l">Psets</span>
-      </div>
+      <div class="stat"><span class="stat-n">IDD-IR</span><span class="stat-l">Psets</span></div>
       <div class="stat-sep"></div>
-      <div class="stat">
-        <span class="stat-n">6</span>
-        <span class="stat-l">Layers</span>
-      </div>
+      <div class="stat"><span class="stat-n">6</span><span class="stat-l">Layers</span></div>
     </div>
-
-    <button class="btn-launch" id="launchBtn" type="button">
-      <span class="btn-icon">◈</span>
-      Launch Demo Viewer
+    <button type="button" class="btn-launch" id="launchBtn">
+      <span class="btn-icon">◈</span> Launch Demo Viewer
     </button>
-
   </div>
 </div>
 
 <script>
-(function() {
-  var launched = false;
+var _launched = false;
+document.getElementById('launchBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (_launched) return;
+  _launched = true;
 
-  function launch(e) {
-    if (e) { e.preventDefault(); e.stopPropagation(); }
-    if (launched) return;
-    launched = true;
+  var btn     = document.getElementById('launchBtn');
+  var scan    = document.getElementById('scanOverlay');
+  var overlay = document.getElementById('overlay');
+  var frame   = document.getElementById('viewerFrame');
 
-    var btn    = document.getElementById('launchBtn');
-    var scan   = document.getElementById('scanOverlay');
-    var overlay= document.getElementById('overlay');
-    var frame  = document.getElementById('viewerFrame');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin-ring"></span>&nbsp;Loading…';
 
-    // Set iframe src now
-    frame.src = 'https://test-six-gules-97.vercel.app/';
+  frame.src = 'https://test-six-gules-97.vercel.app/';
 
-    // Button loading state
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spin-ring"></span> Loading\u2026';
-
-    // Kick off scan after short delay
+  setTimeout(function() {
+    scan.classList.add('active');
+    scan.querySelector('.scan-line').classList.add('running');
+    scan.querySelector('.scan-grid').classList.add('running');
+    setTimeout(function() { overlay.classList.add('fade-out'); }, 700);
     setTimeout(function() {
-      scan.classList.add('active');
-      scan.querySelector('.scan-line').classList.add('running');
-      scan.querySelector('.scan-grid').classList.add('running');
-
-      setTimeout(function() {
-        overlay.classList.add('fade-out');
-      }, 700);
-
-      setTimeout(function() {
-        frame.classList.add('revealed');
-        scan.style.transition = 'opacity 0.5s';
-        scan.style.opacity = '0';
-        setTimeout(function() { if(scan.parentNode) scan.parentNode.removeChild(scan); }, 500);
-      }, 1300);
-    }, 300);
-  }
-
-  window.addEventListener('DOMContentLoaded', function() {
-    var btn = document.getElementById('launchBtn');
-    btn.addEventListener('click', launch, false);
-    btn.addEventListener('touchend', launch, false);
-  });
-})();
+      frame.classList.add('revealed');
+      scan.style.transition = 'opacity 0.5s';
+      scan.style.opacity = '0';
+    }, 1300);
+  }, 200);
+});
 </script>
 </body>
 </html>
