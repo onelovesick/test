@@ -243,6 +243,18 @@ html, body {
   gap: 12px;
 }
 
+/* spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin-ring {
+  display: inline-block;
+  width: 12px; height: 12px;
+  border: 1.5px solid var(--accent);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+
 /* ── SCAN ANIMATION ── */
 #scanOverlay {
   position: fixed;
@@ -400,49 +412,51 @@ html, body {
 </div>
 
 <script>
-function launch() {
-  const btn = document.getElementById('launchBtn');
-  const scan = document.getElementById('scanOverlay');
-  const overlay = document.getElementById('overlay');
-  const frame = document.getElementById('viewerFrame');
+(function() {
+  var launched = false;
 
-  // Inject src now so it starts loading in background
-  frame.src = 'https://test-six-gules-97.vercel.app/';
+  function launch(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    if (launched) return;
+    launched = true;
 
-  // Button loading state
-  btn.classList.add('loading');
-  btn.innerHTML = '<span style="display:inline-block;width:12px;height:12px;border:1.5px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite"></span> Loading…';
+    var btn    = document.getElementById('launchBtn');
+    var scan   = document.getElementById('scanOverlay');
+    var overlay= document.getElementById('overlay');
+    var frame  = document.getElementById('viewerFrame');
 
-  // Spin keyframe
-  if(!document.getElementById('spinStyle')) {
-    const s = document.createElement('style');
-    s.id = 'spinStyle';
-    s.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
-    document.head.appendChild(s);
+    // Set iframe src now
+    frame.src = 'https://test-six-gules-97.vercel.app/';
+
+    // Button loading state
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin-ring"></span> Loading\u2026';
+
+    // Kick off scan after short delay
+    setTimeout(function() {
+      scan.classList.add('active');
+      scan.querySelector('.scan-line').classList.add('running');
+      scan.querySelector('.scan-grid').classList.add('running');
+
+      setTimeout(function() {
+        overlay.classList.add('fade-out');
+      }, 700);
+
+      setTimeout(function() {
+        frame.classList.add('revealed');
+        scan.style.transition = 'opacity 0.5s';
+        scan.style.opacity = '0';
+        setTimeout(function() { if(scan.parentNode) scan.parentNode.removeChild(scan); }, 500);
+      }, 1300);
+    }, 300);
   }
 
-  // Start scan animation after brief pause
-  setTimeout(() => {
-    scan.classList.add('active');
-    scan.querySelector('.scan-line').classList.add('running');
-    scan.querySelector('.scan-grid').classList.add('running');
-
-    // Fade out overlay mid-scan
-    setTimeout(() => {
-      overlay.classList.add('fade-out');
-    }, 700);
-
-    // Reveal iframe after scan
-    setTimeout(() => {
-      frame.classList.add('revealed');
-      scan.style.transition = 'opacity 0.5s';
-      scan.style.opacity = '0';
-      setTimeout(() => scan.remove(), 500);
-    }, 1300);
-
-  }, 300);
-}
-document.getElementById('launchBtn').addEventListener('click', launch);
+  window.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('launchBtn');
+    btn.addEventListener('click', launch, false);
+    btn.addEventListener('touchend', launch, false);
+  });
+})();
 </script>
 </body>
 </html>
